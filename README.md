@@ -1,0 +1,2 @@
+# trapicik
+Trāpījumu skaitīšanas webapp
