@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Google Sheets API Quickstart</title>
+    <title>Trāpījumu reģistrācija</title>
     <meta charset='utf-8' />
+    <link href="trapicik.css" rel="stylesheet" type="text/css"/>
+    <script src="keys.js"></script>
+    <script src="trapicik.js"></script>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
   </head>
   <body>
     <p>Google Sheets API Quickstart</p>
@@ -11,10 +15,23 @@
     <button id="authorize-button" style="display: none;">Authorize</button>
     <button id="signout-button" style="display: none;">Sign Out</button>
 
+    <div id="info"></div>
     <pre id="content"></pre>
 
-    <script src="keys.js"></script>
-    <script src="trapicik.js"></script>
+    <table id="hits">
+      <tr> <td>-</td> <td>X</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>10</td> <td>0</td> </tr>
+      <tr> <td>-</td> <td>9</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>8</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>7</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>6</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>5</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>4</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>3</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>2</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>1</td>  <td>0</td> </tr>
+      <tr> <td>-</td> <td>0</td>  <td>0</td> </tr>
+    </table>
 
     <script async defer src="https://apis.google.com/js/api.js"
       onload="this.onload=function(){};handleClientLoad()"

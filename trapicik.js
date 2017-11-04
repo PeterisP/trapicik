@@ -3,16 +3,63 @@ var DISCOVERY_DOCS = ["https://sheets.googleapis.com/$discovery/rest?version=v4"
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-var SCOPES = "https://www.googleapis.com/auth/spreadsheets.readonly";
+var SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+var SHEET_ID;
+var SHEET_NAME = "Dalībnieki";
+var active_row = 1;
+var series = 1;
+var hits;
 
-var authorizeButton = document.getElementById('authorize-button');
-var signoutButton = document.getElementById('signout-button');
+var authorizeButton;
+var signoutButton;
+
+/** from StackOverflow https://stackoverflow.com/a/2880929 **/
+var urlParams;
+(window.onpopstate = function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+})();
 
 /**
  *  On load, called to load the auth2 library and API client library.
  */
 function handleClientLoad() {
+  authorizeButton = document.getElementById('authorize-button');
+  signoutButton = document.getElementById('signout-button');
+  hits = [0,0,0,0,0,0,0,0,0,0,0,0];
+  SHEET_ID = urlParams["sheet"];
   gapi.load('client:auth2', initClient);
+}
+
+function increment(tbl, row) {
+    return function () {
+      hits[row] = hits[row]+1;
+      tbl.rows[row].cells[2].innerHTML = hits[row];
+    };
+}
+function decrement(tbl, row) {
+    return function () {
+      hits[row] = hits[row]-1;
+      if (hits[row]<0) hits[row] = 0;
+      tbl.rows[row].cells[2].innerHTML = hits[row];
+    };
+}
+function setupTableEvents() {
+  var tbl = document.getElementById("hits");
+  if (tbl != null) {
+      for (var row = 0; row < tbl.rows.length; row++) {
+        tbl.rows[row].cells[0].onclick = (decrement(tbl, row));
+        tbl.rows[row].cells[1].onclick = (increment(tbl, row));
+        tbl.rows[row].cells[2].onclick = (increment(tbl, row));
+      }
+  }
 }
 
 /**
@@ -44,7 +91,7 @@ function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
     authorizeButton.style.display = 'none';
     signoutButton.style.display = 'block';
-    listMajors();
+    updateInfo();
   } else {
     authorizeButton.style.display = 'block';
     signoutButton.style.display = 'none';
@@ -77,23 +124,19 @@ function appendPre(message) {
   pre.appendChild(textContent);
 }
 
-/**
- * Print the names and majors of students in a sample spreadsheet:
- * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
- */
-function listMajors() {
+function updateInfo() {
+
   gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-    range: 'Class Data!A2:E',
+    spreadsheetId: SHEET_ID,
+    range: SHEET_NAME+'!A'+(active_row+1)+':AT'+(active_row+1),
   }).then(function(response) {
     var range = response.result;
     if (range.values.length > 0) {
-      appendPre('Name, Major:');
       for (i = 0; i < range.values.length; i++) {
         var row = range.values[i];
-        // Print columns A and E, which correspond to indices 0 and 4.
-        appendPre(row[0] + ', ' + row[4]);
+        appendPre(row[0] + ', ' + row[1] + ', ' + row[2] + ', ' + row[3] + ', ' + row[4]);
       }
+      setupTableEvents();
     } else {
       appendPre('No data found.');
     }
